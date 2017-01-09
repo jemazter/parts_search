@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Play-pause_button_play_stop_blue_pause.png</file>
+    </qresource>
+</RCC>

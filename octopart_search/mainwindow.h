@@ -15,7 +15,10 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     QString filename;
+    QString outputFilename;
+
     ~MainWindow();
+
 
 private slots:
     void octopartData(QByteArray data);
@@ -24,15 +27,10 @@ private slots:
     void on_pushButton_clicked();
     void on_checkBox_clicked();
     void replyFinished();
-
     void on_checkBox_2_clicked();
-
     void on_checkBox_3_clicked();
-
     void on_checkBox_4_clicked();
-
     void on_checkBox_5_clicked();
-
     void on_checkBox_6_clicked();
 
 private:
@@ -47,6 +45,8 @@ private:
     int i; //index for pn iterations
     bool newRequestAvalaible = true;
     QStringList wordList;
+    int progressBar = 0;
+    int completedRequests = 0;
 };
 
 #endif // MAINWINDOW_H

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>771</width>
-    <height>444</height>
+    <width>859</width>
+    <height>319</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,18 +19,18 @@
      <rect>
       <x>10</x>
       <y>40</y>
-      <width>491</width>
-      <height>80</height>
+      <width>841</width>
+      <height>121</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="1" column="2">
-      <widget class="QCheckBox" name="checkBox_6">
-       <property name="toolTip">
-        <string>Link para o datasheet do componente.</string>
+     <item row="0" column="3">
+      <widget class="QCheckBox" name="checkBox_7">
+       <property name="enabled">
+        <bool>false</bool>
        </property>
        <property name="text">
-        <string>DATASHEET</string>
+        <string>NUMERO DE PINOS</string>
        </property>
       </widget>
      </item>
@@ -44,6 +44,23 @@
        </property>
       </widget>
      </item>
+     <item row="1" column="2">
+      <widget class="QCheckBox" name="checkBox_6">
+       <property name="toolTip">
+        <string>Link para o datasheet do componente.</string>
+       </property>
+       <property name="text">
+        <string>DATASHEET</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QCheckBox" name="checkBox_3">
+       <property name="text">
+        <string>ROHS</string>
+       </property>
+      </widget>
+     </item>
      <item row="1" column="0">
       <widget class="QCheckBox" name="checkBox_4">
        <property name="toolTip">
@@ -51,6 +68,13 @@
        </property>
        <property name="text">
         <string>LIFECYCLE</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QCheckBox" name="checkBox_5">
+       <property name="text">
+        <string>ENCAPSULAMENTO</string>
        </property>
       </widget>
      </item>
@@ -64,41 +88,46 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="2">
-      <widget class="QCheckBox" name="checkBox_3">
-       <property name="text">
-        <string>ROHS</string>
+     <item row="2" column="1" colspan="2">
+      <widget class="QPushButton" name="pushButton">
+       <property name="enabled">
+        <bool>true</bool>
        </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QCheckBox" name="checkBox_5">
+       <property name="focusPolicy">
+        <enum>Qt::StrongFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Inicia a consulta.</string>
+       </property>
+       <property name="autoFillBackground">
+        <bool>false</bool>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border : none;</string>
+       </property>
        <property name="text">
-        <string>ENCAPSULAMENTO</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="resources.qrc">
+         <normaloff>:/Play-pause_button_play_stop_blue_pause.png</normaloff>:/Play-pause_button_play_stop_blue_pause.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>34</width>
+         <height>34</height>
+        </size>
        </property>
       </widget>
      </item>
     </layout>
    </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>210</x>
-      <y>140</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>PushButton</string>
-    </property>
-   </widget>
    <widget class="QWidget" name="horizontalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>0</x>
+      <x>10</x>
       <y>0</y>
-      <width>511</width>
+      <width>841</width>
       <height>41</height>
      </rect>
     </property>
@@ -123,10 +152,36 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>180</y>
-      <width>741</width>
-      <height>192</height>
+      <y>210</y>
+      <width>841</width>
+      <height>41</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QProgressBar" name="progressBar">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>170</y>
+      <width>841</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>250</y>
+      <width>841</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Component Lookup V0.9 - Powered by Octopart                                                                                                                                  Desenvolvido por: Jean Gilberto Mazurkievicz</string>
     </property>
    </widget>
   </widget>
@@ -135,7 +190,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>771</width>
+     <width>859</width>
      <height>21</height>
     </rect>
    </property>
@@ -155,6 +210,7 @@
     <property name="title">
      <string>Sobre</string>
     </property>
+    <addaction name="actionSobre"/>
    </widget>
    <addaction name="menuArquivo"/>
    <addaction name="menuConfigura_es"/>
@@ -181,17 +237,33 @@
    </attribute>
   </widget>
   <action name="actionSair">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Sair</string>
    </property>
   </action>
   <action name="actionAlterar">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Alterar</string>
    </property>
   </action>
+  <action name="actionSobre">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Sobre</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

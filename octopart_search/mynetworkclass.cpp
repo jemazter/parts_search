@@ -13,17 +13,17 @@ void MyNetworkClass::makeRequest(QString endPointRequest,QString mpn,bool descri
     QString mpn_completo = "[{\"mpn\":\"" + mpn + "\"}]";
     if(descricao==true)
     {
-        query.addQueryItem("include","descriptions");
+        query.addQueryItem("include[]","descriptions");
         qDebug()<<"descriptions";
     }
     if((estilo==true)||(rohs==true)||(lifecycle==true)||(encapsulamento==true))
     {
-        query.addQueryItem("include","specs");
-        qDebug()<<"SPECS TRUE";
+        query.addQueryItem("include[]","specs");
+        //qDebug()<<"SPECS TRUE";
     }
     if(datasheet==true)
     {
-        query.addQueryItem("include","datasheets");
+        query.addQueryItem("include[]","datasheets");
     }
     //-------------------------------------------------
     // Adiciona os itens solicitados a pesquisa (query)

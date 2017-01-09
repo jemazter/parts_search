@@ -12,6 +12,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
+#include <QDateTime>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -40,53 +41,187 @@ void MainWindow::on_selectFileButton_clicked()
 void MainWindow::on_pushButton_clicked()
 {
 
-    QFile file;
+    ui->progressBar->setValue(0);
+    QFile file;    
+    //------------------------------------------------------------------------
+    // Geração do nome do novo arquivo
+    //------------------------------------------------------------------------
+    outputFilename = filename;
+    outputFilename = outputFilename.remove(filename.size()-4,filename.size());
+    outputFilename.append("_editado.csv");
+
+    qDebug()<<outputFilename;
     file.setFileName(filename);
+    //------------------------------------------------------------------------
+
+
+    //------------------------------------------------------------------------
+    // Abertura do arquivo para leitura dos PNs
+    //------------------------------------------------------------------------
     if (!file.open(QIODevice::ReadOnly))
     {
        qDebug() << file.errorString();
+       ui->textBrowser->append(file.errorString());
     }
 
+    ui->textBrowser->append("Lendo arquivo de entrada.");
 
     while (!file.atEnd())
     {
        QByteArray line = file.readLine();
        wordList.append(line.split(',').first());
+       QCoreApplication::processEvents();
     }
-    // qDebug()<<wordList.size();
+    //------------------------------------------------------------------------
+
+    ui->textBrowser->append("Numero de Itens:");
+    ui->textBrowser->append(QString::number(wordList.size()));
+
+    //------------------------------------------------------------------------
+    //Leitura do Arquivo
+    //------------------------------------------------------------------------
     for(i=0;i<(wordList.size());i++)
     {
-        // qDebug()<<wordList[i];
+         //qDebug()<<wordList[i];
          octopart.makeRequest("https://octopart.com/api/v3/parts/match",wordList[i],descricao,estilo,rohs,lifecycle,encapsulamento,datasheet);
          QThread::msleep(400);
     }
+    //------------------------------------------------------------------------
+    i = wordList.size();
 }
 
 
 void MainWindow::octopartData(QByteArray data)
 {
+    //---------------------------------------------------------------------------
+    //Atualizaça~oda barra de progresso
+    //---------------------------------------------------------------------------
+    completedRequests++;
+    progressBar = (100*completedRequests)/i;
+    ui->progressBar->setValue(progressBar);
+    //---------------------------------------------------------------------------
+
+    //---------------------------------------------------------------------------
+    //JSon Parsing
+    //---------------------------------------------------------------------------
+
+    //ui->progressBar->setValue();
+
     const QJsonDocument temp = QJsonDocument::fromJson(data);
     const QJsonObject jObject = temp.object();
     const QJsonArray results = jObject["results"].toArray();
-
+    //qDebug()<< results;
     for(const QJsonValue& res : results){
         const QJsonObject result= res.toObject();
         const QJsonArray items = result["items"].toArray();
-//        for(const QJsonValue& ite : items){
+//        for(const QJsonValue& ite : items){                                           //iterates troughr all items (0,1,2,3,4...)
+
             const QJsonObject item = items.at(0).toObject();
             const QJsonObject specs = item["specs"].toObject();
+
             const QJsonObject case_package = specs["case_package"].toObject();
-            const QJsonArray value = case_package["value"].toArray();
-            const QJsonObject lifecycle_1 = specs["lifecycle_status"].toObject();
-            const QJsonArray lifecycle_2 = lifecycle_1["value"].toArray();
-            const QJsonArray mpn = item["mpn"].toArray();
-            //for(auto& val : value){
-            if(value.isEmpty())
-                qDebug() << "N.D" <<lifecycle_2;
-            else
-                qDebug() << value << lifecycle_2 << mpn;
-            //}
-//        }
+            const QJsonArray case_pack_value = case_package["value"].toArray();
+
+            const QJsonObject lifecycle_status = specs["lifecycle_status"].toObject();
+            const QJsonArray lifecycle__status_value = lifecycle_status["value"].toArray();
+
+            const QString mpn = item["mpn"].toString();
+
+            const QJsonObject rohs_status = specs["rohs_status"].toObject();
+            const QJsonArray rohs_status_value = rohs_status["value"].toArray();
+            //for(auto& val : value){                                                   //iterates trough all values from all items (0,1,2,3,4...)
+
+            const QJsonObject mounting_style = specs["mounting_style"].toObject();
+            const QJsonArray mounting_style_value = mounting_style["value"].toArray();
+
+            const QJsonArray datasheet_array = item["datasheets"].toArray();
+            const QJsonObject datasheet_item = datasheet_array.at(0).toObject();
+            const QString datasheet_url = datasheet_item["url"].toString();
+
+            const QJsonArray descriptions_array = item["descriptions"].toArray();
+            const QJsonObject description_item = descriptions_array.at(0).toObject();
+            const QString description_value = description_item["value"].toString();
+
+            //---------------------------------------------------------------------------------
+
+            qDebug() << description_value;
+
+
+            //---------------------------------------------------------------------------------
+            //Escrita no arquivo de saida
+            //---------------------------------------------------------------------------------
+            QFile outputFile(outputFilename);
+            if ( outputFile.open(QIODevice::Append) )
+            {
+                QTextStream stream( &outputFile );
+                if(completedRequests==1)
+                {
+                    ui->textBrowser->append("Iniciando consulta ao servidor...");
+                    stream << "Part Number" << "," << "Descrição" << "," << "Estilo de Montagem" << "," << "ROHS" << "," << "Ciclo de Vida" << "," << "Encapsulamento" << "," << "Datasheet" << "\r\n";
+                }
+                stream << mpn << ",";
+                if(descricao==true)
+                {
+                   if(description_value.isEmpty())
+                       stream << "N.D";
+                   else
+                    stream << description_value << ",";
+                }
+                if(estilo==true)
+                {
+                    if(mounting_style_value[0].toString().isEmpty())
+                        stream << "N.D";
+                    else
+                        stream << mounting_style_value[0].toString() << ",";
+                }
+                if(rohs==true)
+                {
+                    if(rohs_status_value[0].toString().isEmpty())
+                        stream << "N.D";
+                    else
+                        stream << rohs_status_value[0].toString() << ",";
+                }
+                if(lifecycle==true)
+                {
+                    if(lifecycle__status_value[0].toString().isEmpty())
+                        stream << "N.D";
+                    else
+                        stream << lifecycle__status_value[0].toString() << ",";
+                }
+                if(encapsulamento==true)
+                {
+                    if(case_pack_value[0].toString().isEmpty())
+                        stream << "N.D";
+                    else
+                        stream << case_pack_value[0].toString() << ",";
+                }
+                if(datasheet==true)
+                {
+                    if(datasheet_url.isEmpty())
+                        stream << "N.D";
+                    else
+                        stream << datasheet_url << ",";
+                }
+
+                stream << "\r\n";
+            }
+            outputFile.close();
+
+            //---------------------------------------------------------------------------------
+
+            //---------------------------------------------------------------------------------
+            //"Limpeza de Variaveis"
+            //---------------------------------------------------------------------------------
+            if(i==completedRequests)
+            {
+                i=0;
+                completedRequests = 0;
+                progressBar = 0;
+                wordList.clear();
+                ui->textBrowser->append("Solicitação Concluida!");
+            }
+
+           //}
     }
 }
 
